@@ -1,16 +1,17 @@
-const playerFactory = function (playerName, move) {
-    return { playerName, move };
+const playerFactory = function (playerName, moves, mark) {
+    return { playerName, moves, mark };
 };
 
 const gameBoardModule = (function () {
     const gameBoard = [];
-    let player1 = playerFactory("player1", []);
-    let player2 = playerFactory("player2", []);
+    let player1 = playerFactory("player1", [], "X");
+    let player2 = playerFactory("player2", [], "O");
     let activePlayer = player1;
 
     const updatePlayerMove = (playerSelection) => {
         console.log("Update Move ", gameBoardModule.activePlayer);
-        gameBoardModule.activePlayer.move.push(playerSelection);
+        gameBoardModule.activePlayer.moves.push(playerSelection);
+        displayController.updateGameboardWithPlayerSelection(gameBoardModule.activePlayer);
     };
 
     const toggleActivePlayer = () => {
@@ -35,25 +36,35 @@ const displayController = (function () {
             gameBoardDisplay.appendChild(gameSquare);
         }
     };
-    const getPlayerInput = () => {
-        let gameSquare = document.querySelectorAll("#game-square");
-        console.log(gameSquare);
-        gameSquare.forEach((box) => {
-            box.addEventListener("click", () => {
-                _updatePlayerSelection(
-                    box.dataset.boxnumber,
-                    gameBoardModule.activePlayer
-                );
-            });
+
+    const updateGameboardWithPlayerSelection = function (activePlayer) {
+        const gameSquare = document.querySelectorAll("#game-square");
+        activePlayer.moves.forEach((move) => {
+            gameSquare[move].textContent = activePlayer.mark;
         });
     };
-    const _updatePlayerSelection = (playerSelection, activePlayer) => {
-        console.log(activePlayer);
-        gameBoardModule.updatePlayerMove(parseInt(playerSelection));
+
+    const getPlayerInput = () => {
+        let gameSquare = document.querySelectorAll("#game-square");
+        gameSquare.forEach((square) => {
+            square.addEventListener(
+                "click",
+                () => {
+                    _updatePlayerSelection(square);
+                },
+                {
+                    once: true,
+                }
+            );
+        });
+    };
+
+    const _updatePlayerSelection = (playerSelection) => {
+        gameBoardModule.updatePlayerMove(parseInt(playerSelection.dataset.boxnumber));
         gameBoardModule.toggleActivePlayer();
     };
 
-    return { createGameBoard, getPlayerInput };
+    return { createGameBoard, getPlayerInput, updateGameboardWithPlayerSelection };
 })();
 
 const game = (function () {
