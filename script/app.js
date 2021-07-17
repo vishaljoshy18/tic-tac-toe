@@ -7,11 +7,44 @@ const gameBoardModule = (function () {
     let player1 = playerFactory("player1", [], "X");
     let player2 = playerFactory("player2", [], "O");
     let activePlayer = player1;
+    const winningCombos = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [6, 4, 2],
+    ];
 
     const updatePlayerMove = (playerSelection) => {
         console.log("Update Move ", gameBoardModule.activePlayer);
         gameBoardModule.activePlayer.moves.push(playerSelection);
-        displayController.updateGameboardWithPlayerSelection(gameBoardModule.activePlayer);
+        displayController.updateGameBoardWithPlayerSelection(gameBoardModule.activePlayer);
+        _updateGameBoard(gameBoardModule.activePlayer);
+    };
+
+    const _updateGameBoard = function (player) {
+        player.moves.forEach((move) => {
+            gameBoard[move] = player.playerName;
+        });
+        _checkForWinner(player.playerName);
+    };
+    const _checkForWinner = function (playerName) {
+        console.log(gameBoard);
+        winningCombos.forEach((combo) => {
+            let i = combo[0],
+                j = combo[1],
+                k = combo[2];
+            if (
+                gameBoard[i] == playerName &&
+                gameBoard[j] == playerName &&
+                gameBoard[k] == playerName
+            ) {
+                console.log("winner", playerName);
+            }
+        });
     };
 
     const toggleActivePlayer = () => {
@@ -37,7 +70,7 @@ const displayController = (function () {
         }
     };
 
-    const updateGameboardWithPlayerSelection = function (activePlayer) {
+    const updateGameBoardWithPlayerSelection = function (activePlayer) {
         const gameSquare = document.querySelectorAll("#game-square");
         activePlayer.moves.forEach((move) => {
             gameSquare[move].textContent = activePlayer.mark;
@@ -64,7 +97,11 @@ const displayController = (function () {
         gameBoardModule.toggleActivePlayer();
     };
 
-    return { createGameBoard, getPlayerInput, updateGameboardWithPlayerSelection };
+    return {
+        createGameBoard,
+        getPlayerInput,
+        updateGameBoardWithPlayerSelection,
+    };
 })();
 
 const game = (function () {
