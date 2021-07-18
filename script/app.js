@@ -43,6 +43,7 @@ const gameBoardModule = (function () {
                 gameBoard[k] == playerName
             ) {
                 console.log("winner", playerName);
+                displayController.declareWinner(playerName);
             }
         });
     };
@@ -54,6 +55,7 @@ const gameBoardModule = (function () {
             gameBoardModule.activePlayer = player1;
         }
     };
+    
 
     return { activePlayer, gameBoard, toggleActivePlayer, updatePlayerMove };
 })();
@@ -80,11 +82,7 @@ const displayController = (function () {
     const getPlayerInput = () => {
         let gameSquare = document.querySelectorAll("#game-square");
         gameSquare.forEach((square) => {
-            square.addEventListener(
-                "click",
-                () => {
-                    _updatePlayerSelection(square);
-                },
+            square.addEventListener("click",_updatePlayerSelection,
                 {
                     once: true,
                 }
@@ -92,15 +90,29 @@ const displayController = (function () {
         });
     };
 
-    const _updatePlayerSelection = (playerSelection) => {
-        gameBoardModule.updatePlayerMove(parseInt(playerSelection.dataset.boxnumber));
+    const _updatePlayerSelection = (event) => {
+        gameBoardModule.updatePlayerMove(parseInt(event.target.dataset.boxnumber));
         gameBoardModule.toggleActivePlayer();
+    };
+
+    const declareWinner = (playerName) => {
+        document.querySelector('#winner-text').textContent= `${playerName} wins!`;
+        let gameSquare = document.querySelectorAll("#game-square");
+        gameSquare.forEach((square) => {
+            square.removeEventListener("click",_updatePlayerSelection);
+        });
+        const tryAgainButton = document.querySelector('#try-again-button');
+        tryAgainButton.style.display = 'block';
+        tryAgainButton.addEventListener('click',()=>{
+            window.location.reload()
+        })
     };
 
     return {
         createGameBoard,
         getPlayerInput,
         updateGameBoardWithPlayerSelection,
+        declareWinner,
     };
 })();
 

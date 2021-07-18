@@ -5,11 +5,21 @@
     width: 150px;
 }
 
-.game-square{
+.game-square {
     border: solid 1px;
     height: 50px;
     width: 50px;
     text-align: center;
     vertical-align: middle;
     line-height: 50px;
+}
+
+.game-end-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#try-again-button{
+    display: none;
 }
