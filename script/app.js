@@ -4,8 +4,8 @@ const playerFactory = function (playerName, moves, mark) {
 
 const gameBoardModule = (function () {
     const gameBoard = [];
-    let player1 = playerFactory("player1", [], "X");
-    let player2 = playerFactory("player2", [], "O");
+    let player1 = playerFactory("player1", [], "X"),
+        player2 = playerFactory("player2", [], "O");
     let activePlayer = player1;
     const winningCombos = [
         [0, 1, 2],
@@ -43,7 +43,11 @@ const gameBoardModule = (function () {
                 gameBoard[k] == playerName
             ) {
                 console.log("winner", playerName);
-                displayController.declareWinner(playerName);
+                displayController.endGameText(playerName);
+            }
+            if (gameBoard.length == 9 && !(Object.values(gameBoard).length !== gameBoard.length)) {
+                //checks if array has empty elements
+                displayController.endGameText("", true);
             }
         });
     };
@@ -55,7 +59,6 @@ const gameBoardModule = (function () {
             gameBoardModule.activePlayer = player1;
         }
     };
-    
 
     return { activePlayer, gameBoard, toggleActivePlayer, updatePlayerMove };
 })();
@@ -82,11 +85,9 @@ const displayController = (function () {
     const getPlayerInput = () => {
         let gameSquare = document.querySelectorAll("#game-square");
         gameSquare.forEach((square) => {
-            square.addEventListener("click",_updatePlayerSelection,
-                {
-                    once: true,
-                }
-            );
+            square.addEventListener("click", _updatePlayerSelection, {
+                once: true,
+            });
         });
     };
 
@@ -95,24 +96,29 @@ const displayController = (function () {
         gameBoardModule.toggleActivePlayer();
     };
 
-    const declareWinner = (playerName) => {
-        document.querySelector('#winner-text').textContent= `${playerName} wins!`;
-        let gameSquare = document.querySelectorAll("#game-square");
-        gameSquare.forEach((square) => {
-            square.removeEventListener("click",_updatePlayerSelection);
+    const endGameText = (playerName, draw = false) => {
+        if (!draw) {
+            document.querySelector("#winner-text").textContent = `${playerName} wins!`;
+            let gameSquare = document.querySelectorAll("#game-square");
+            gameSquare.forEach((square) => {
+                square.removeEventListener("click", _updatePlayerSelection);
+            });
+        }
+        else{
+            document.querySelector("#winner-text").textContent = 'Draw !';
+        }
+        const tryAgainButton = document.querySelector("#try-again-button");
+        tryAgainButton.style.display = "block";
+        tryAgainButton.addEventListener("click", () => {
+            window.location.reload();
         });
-        const tryAgainButton = document.querySelector('#try-again-button');
-        tryAgainButton.style.display = 'block';
-        tryAgainButton.addEventListener('click',()=>{
-            window.location.reload()
-        })
     };
 
     return {
         createGameBoard,
         getPlayerInput,
         updateGameBoardWithPlayerSelection,
-        declareWinner,
+        endGameText,
     };
 })();
 
